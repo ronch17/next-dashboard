@@ -1,8 +1,7 @@
-import React from 'react'
 
 const Layout = ({children}: {children: React.ReactNode}) => {
     return (
-        <div className="bg-blue-100 h-full">{children}</div>
+        <div>{children}</div>
     )
 }
 export default Layout
