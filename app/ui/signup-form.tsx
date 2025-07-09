@@ -11,17 +11,20 @@ import {
 import { Button } from "./button";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import { signUpUser } from "@/app/lib/actions"; //
+import { SignupState, signUpUser } from "@/app/lib/actions"; //
 import Link from "next/link";
 
 export default function SignupForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
-  const [state, formAction, isPending] = useActionState(signUpUser, {
-    message: null,
-    errors: {},
-  });
+  const [state, formAction, isPending] = useActionState<SignupState, FormData>(
+    signUpUser,
+    {
+      message: null,
+      errors: {},
+    },
+  );
 
   return (
     <form action={formAction} className="space-y-3">

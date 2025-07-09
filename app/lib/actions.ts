@@ -29,8 +29,16 @@ export async function authenticate(
     throw error;
   }
 }
+export type SignupState = {
+  message: string | null;
+  errors?: {
+    name?: string[];
+    email?: string[];
+    password?: string[];
+  };
+};
 
-export async function signUpUser(prevState: State, formData: FormData) {
+export async function signUpUser(prevState: SignupState, formData: FormData) {
   const schema = z.object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email"),
