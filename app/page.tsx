@@ -16,7 +16,7 @@ export default function Page() {
           <p
             className={`${poppins.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}
           >
-            <strong>Welcome to Ron's Dashboard system</strong>
+            <strong>Welcome to Ron&apos;s Dashboard system</strong>
             <small className="block text-sm text-gray-500">
               Log in to see your
             </small>

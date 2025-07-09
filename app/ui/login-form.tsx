@@ -80,7 +80,7 @@ export default function LoginForm() {
           )}
         </div>
         <div>
-          Don't have an account yet?{" "}
+          Don&apos;t have an account yet?
           <Link href="/sign-up" className="text-blue-800 hover:underline">
             Sign up
           </Link>
