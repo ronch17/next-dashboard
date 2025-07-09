@@ -1,6 +1,6 @@
 // Loading animation
 const shimmer =
-  'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
+  "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent";
 
 export function CardSkeleton() {
   return (
@@ -212,6 +212,39 @@ export function InvoicesTableSkeleton() {
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function AuthFormSkeleton() {
+  return (
+    <div className={`${shimmer} flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8`}>
+      <div className="mb-3 h-7 w-40 rounded bg-gray-200" /> {/* Title */}
+      <div className="space-y-5 mt-4">
+        {/* Name field */}
+        <div className="space-y-2">
+          <div className="h-4 w-24 rounded bg-gray-200" /> {/* Label */}
+          <div className="h-10 w-full rounded-md bg-gray-200" />
+        </div>
+
+        {/* Email field */}
+        <div className="space-y-2">
+          <div className="h-4 w-24 rounded bg-gray-200" />
+          <div className="h-10 w-full rounded-md bg-gray-200" />
+        </div>
+
+        {/* Password field */}
+        <div className="space-y-2">
+          <div className="h-4 w-24 rounded bg-gray-200" />
+          <div className="h-10 w-full rounded-md bg-gray-200" />
+        </div>
+
+        {/* Submit button */}
+        <div className="h-10 w-full rounded-md bg-gray-300 mt-6" />
+
+        {/* Link to login */}
+        <div className="h-4 w-32 rounded bg-gray-200 mt-2" />
       </div>
     </div>
   );

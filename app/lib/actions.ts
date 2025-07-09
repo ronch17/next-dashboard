@@ -4,8 +4,75 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import postgres from "postgres";
+import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
+import bcrypt from "bcrypt";
+import { auth } from "@/auth";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn("credentials", formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return "Invalid credentials.";
+        default:
+          return "Something went wrong.";
+      }
+    }
+    throw error;
+  }
+}
+
+export async function signUpUser(prevState: State, formData: FormData) {
+  const schema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+  });
+
+  const validated = schema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
+
+  if (!validated.success) {
+    return {
+      errors: validated.error.flatten().fieldErrors,
+      message: "Validation failed.",
+    };
+  }
+
+  const { name, email, password } = validated.data;
+
+  const existingUser = await sql`
+    SELECT id FROM users WHERE email = ${email}
+  `;
+  if (existingUser.length > 0) {
+    return { message: "User already exists." };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    await sql`
+      INSERT INTO users (name, email, password)
+      VALUES (${name}, ${email}, ${hashedPassword})
+    `;
+  } catch (err) {
+    console.error("Signup Error:", err);
+    return { message: "Signup failed. Try again." };
+  }
+
+  redirect("/login");
+}
 
 const FormSchema = z.object({
   id: z.string(),
@@ -33,13 +100,15 @@ export type State = {
 };
 
 export async function createInvoice(prevState: State, formData: FormData) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("Not authenticated");
+
   const validatedFields = CreateInvoice.safeParse({
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
     status: formData.get("status"),
   });
-
-  console.log(validatedFields);
 
   if (!validatedFields.success) {
     return {
@@ -48,13 +117,15 @@ export async function createInvoice(prevState: State, formData: FormData) {
     };
   }
 
-  // Prepare data for insertion into the database
   const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split("T")[0];
 
   try {
-    await sql`INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date})`;
+    await sql`
+      INSERT INTO invoices (customer_id, amount, status, date, user_id)
+      VALUES (${customerId}, ${amountInCents}, ${status}, ${date}, ${userId})
+    `;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to create invoice.");

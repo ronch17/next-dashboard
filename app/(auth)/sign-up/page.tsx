@@ -1,6 +1,7 @@
 import AcmeLogo from "@/app/ui/acme-logo";
-import LoginForm from "@/app/ui/login-form";
+import SignupForm from "@/app/ui/signup-form";
 import { Suspense } from "react";
+import { AuthFormSkeleton } from "@/app/ui/skeletons";
 
 export default function LoginPage() {
   return (
@@ -11,8 +12,8 @@ export default function LoginPage() {
             <AcmeLogo />
           </div>
         </div>
-        <Suspense>
-          <LoginForm />
+        <Suspense fallback={<AuthFormSkeleton />}>
+          <SignupForm />
         </Suspense>
       </div>
     </main>
